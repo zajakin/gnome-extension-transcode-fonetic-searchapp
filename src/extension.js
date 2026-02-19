@@ -1,11 +1,49 @@
 import Gio from "gi://Gio";
 import Shell from "gi://Shell";
+import GObject from "gi://GObject";
+import Adw from "gi://Adw";
 // noinspection JSFileReferences
 import * as AppDisplay from "resource:///org/gnome/shell/ui/appDisplay.js";
 
-let originalGetInitialResultSet = null;
+// Cyrillic to Latin transliteration
+const cyrillicToLatinDefault = new Map([
+    ['а', 'a'],
+    ['б', 'b'],
+    ['в', 'v'],
+    ['г', 'g'],
+    ['д', 'd'],
+    ['е', 'e'],
+    ['ё', 'yo'],
+    ['ж', 'zh'],
+    ['з', 'z'],
+    ['и', 'i'],
+    ['й', 'y'],
+    ['к', 'k'],
+    ['л', 'l'],
+    ['м', 'm'],
+    ['н', 'n'],
+    ['о', 'o'],
+    ['п', 'p'],
+    ['р', 'r'],
+    ['с', 's'],
+    ['т', 't'],
+    ['у', 'u'],
+    ['ы', 'y'],
+    ['х', 'h'],
+    ['ф', 'f'],
+    ['ц', 'c'],
+    ['ч', 'ch'],
+    ['ш', 'sh'],
+    ['щ', 'sch'],
+    ['ь', ''],
+    ['ъ', ''],
+    ['э', 'e'],
+    ['ю', 'yu'],
+    ['я', 'ya']
+]);
 
-const cyrillicToLatin = new Map([
+// Default phonetic layout (Dvorak-like phonetic)
+const phoneticLayoutDefault = new Map([
     ['а', 'a'],
     ['б', 'b'],
     ['в', 'w'],
@@ -36,12 +74,18 @@ const cyrillicToLatin = new Map([
     ['щ', ']'],
     ['ь', 'x'],
     ['ъ', '^'],
-    ['э', '\\'],
+    ['э', '\'],
     ['ю', '`'],
-    ['я', 'q]'
+    ['я', 'q']
 ]);
 
+let originalGetInitialResultSet = null;
+
+// Maps for bidirectional transliteration
+const cyrillicToLatin = new Map(cyrillicToLatinDefault);
 const latinToCyrillic = new Map();
+const phoneticLayout = new Map(phoneticLayoutDefault);
+const phoneticToLatin = new Map();
 
 function generateInvertedDict(sourceMap, destMap) {
     sourceMap.forEach((value, key) => {
@@ -73,13 +117,29 @@ function getResultSet(terms) {
             terms
         );
     }
+
     try {
+        // Original query
         groups = Gio.DesktopAppInfo.search(query);
+        
+        // Cyrillic to Latin transliteration
         groups = groups.concat(
             Gio.DesktopAppInfo.search(transcode(query, cyrillicToLatin))
         );
+        
+        // Latin to Cyrillic transliteration
         groups = groups.concat(
             Gio.DesktopAppInfo.search(transcode(query, latinToCyrillic))
+        );
+        
+        // Phonetic layout transliteration
+        groups = groups.concat(
+            Gio.DesktopAppInfo.search(transcode(query, phoneticLayout))
+        );
+        
+        // Phonetic to Latin transliteration
+        groups = groups.concat(
+            Gio.DesktopAppInfo.search(transcode(query, phoneticToLatin))
         );
     } catch (error) {
         console.error("An error occurred while searching:", error);
@@ -98,13 +158,30 @@ function getResultSet(terms) {
             })
         );
     });
-    return results;
+
+    // Remove duplicates while preserving order
+    let seen = new Set();
+    return results.filter(appID => {
+        if (seen.has(appID)) {
+            return false;
+        }
+        seen.add(appID);
+        return true;
+    });
 }
 
 export default class TranscodeAppSearchExtension {
+    constructor(metadata) {
+        this.metadata = metadata;
+    }
+
     enable() {
         if (originalGetInitialResultSet === null) {
+            // Initialize maps
             generateInvertedDict(cyrillicToLatin, latinToCyrillic);
+            generateInvertedDict(phoneticLayout, phoneticToLatin);
+            
+            // Patch AppSearchProvider
             originalGetInitialResultSet =
                 AppDisplay.AppSearchProvider.prototype.getInitialResultSet;
             AppDisplay.AppSearchProvider.prototype.getInitialResultSet =
@@ -119,5 +196,6 @@ export default class TranscodeAppSearchExtension {
             originalGetInitialResultSet = null;
         }
         latinToCyrillic.clear();
+        phoneticToLatin.clear();
     }
 }
