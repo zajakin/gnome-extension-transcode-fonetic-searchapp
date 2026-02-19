@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.transcode-fonetic-searchapp" path="/org/gnome/shell/extensions/transcode-fonetic-searchapp/" gettext-domain="transcode-fonetic-searchapp">
+    <key type="b" name="enable-cyrillic-to-latin">
+      <default>true</default>
+      <summary>Enable Cyrillic to Latin transliteration</summary>
+      <description>Transliterate Cyrillic characters to Latin alphabet</description>
+    </key>
+    <key type="b" name="enable-latin-to-cyrillic">
+      <default>true</default>
+      <summary>Enable Latin to Cyrillic transliteration</summary>
+      <description>Transliterate Latin characters to Cyrillic alphabet</description>
+    </key>
+    <key type="b" name="enable-phonetic-layout">
+      <default>true</default>
+      <summary>Enable phonetic layout transliteration</summary>
+      <description>Support phonetic keyboard layout transliteration</description>
+    </key>
+    <key type="s" name="phonetic-layout">
+      <default>"dvorak"</default>
+      <summary>Phonetic layout type</summary>
+      <description>The phonetic layout to use (dvorak or custom)</description>
+    </key>
+  </schema>
+</schemalist>
