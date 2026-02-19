@@ -3,6 +3,7 @@
   "name": "Transcode App Search (Fonetic)",
   "shell-version": ["45", "46", "47", "48", "49"],
   "url": "https://github.com/zajakin/gnome-extension-transcode-fonetic-searchapp",
-  "uuid": "transcode-appsearch-fonetic@pz@magisters.net",
-  "version": 4
+  "uuid": "transcode-fonetic-searchapp@zajakin.github.io",
+  "settings-schema": "org.gnome.shell.extensions.transcode-fonetic-searchapp"
+  "version": 5
 }
