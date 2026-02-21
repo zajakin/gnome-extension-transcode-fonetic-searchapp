@@ -5,24 +5,18 @@ import { ExtensionPreferences } from "resource:///org/gnome/Shell/Extensions/js/
 
 export default class TranscodeAppSearchPreferences extends ExtensionPreferences {
   fillPreferencesWindow(window) {
-    // ExtensionPreferences предоставляет встроенный метод для безопасного получения настроек
-    const settings = this.getSettings(
-      "org.gnome.shell.extensions.transcode-fonetic-searchapp",
-    );
+    const settings = this.getSettings();
 
-    // Создаем страницу настроек
     const page = new Adw.PreferencesPage({
       title: "Transliteration Settings",
       icon_name: "document-properties-symbolic",
     });
 
-    // Создаем группу транслитерации
     const transliterationGroup = new Adw.PreferencesGroup({
       title: "Transliteration Methods",
       description: "Enable or disable different transliteration methods",
     });
 
-    // Переключатель кириллицы в латиницу
     const cyrillicToLatinSwitch = new Gtk.Switch({
       active: settings.get_boolean("enable-cyrillic-to-latin"),
       valign: Gtk.Align.CENTER,
@@ -35,13 +29,12 @@ export default class TranscodeAppSearchPreferences extends ExtensionPreferences 
     );
     const cyrillicToLatinRow = new Adw.ActionRow({
       title: "Cyrillic to Latin",
-      subtitle: "Search 'ашду' to find 'file-roller'",
+      subtitle: "Search 'Учеу' to find 'Extensions'",
       activatable_widget: cyrillicToLatinSwitch,
     });
     cyrillicToLatinRow.add_suffix(cyrillicToLatinSwitch);
     transliterationGroup.add(cyrillicToLatinRow);
 
-    // Переключатель латиницы в кириллицу
     const latinToCyrillicSwitch = new Gtk.Switch({
       active: settings.get_boolean("enable-latin-to-cyrillic"),
       valign: Gtk.Align.CENTER,
@@ -54,13 +47,12 @@ export default class TranscodeAppSearchPreferences extends ExtensionPreferences 
     );
     const latinToCyrillicRow = new Adw.ActionRow({
       title: "Latin to Cyrillic",
-      subtitle: "Search 'file-roller' to find application with Cyrillic name",
+      subtitle: "Search 'Hfcib' to find 'Расширения'",
       activatable_widget: latinToCyrillicSwitch,
     });
     latinToCyrillicRow.add_suffix(latinToCyrillicSwitch);
     transliterationGroup.add(latinToCyrillicRow);
 
-    // Переключатель фонетической раскладки
     const phoneticLayoutSwitch = new Gtk.Switch({
       active: settings.get_boolean("enable-phonetic-layout"),
       valign: Gtk.Align.CENTER,
@@ -73,7 +65,8 @@ export default class TranscodeAppSearchPreferences extends ExtensionPreferences 
     );
     const phoneticLayoutRow = new Adw.ActionRow({
       title: "Phonetic Layout",
-      subtitle: "Support phonetic keyboard layout transliteration",
+      subtitle:
+        "Support phonetic: 'Ras[i' to find 'Расширения' and 'Еьтен' to find 'Extensions'",
       activatable_widget: phoneticLayoutSwitch,
     });
     phoneticLayoutRow.add_suffix(phoneticLayoutSwitch);
@@ -81,7 +74,6 @@ export default class TranscodeAppSearchPreferences extends ExtensionPreferences 
 
     page.add(transliterationGroup);
 
-    // Создаем группу выбора раскладки
     const layoutGroup = new Adw.PreferencesGroup({
       title: "Phonetic Layout Type",
       description: "Choose the phonetic layout to use",
@@ -91,7 +83,6 @@ export default class TranscodeAppSearchPreferences extends ExtensionPreferences 
     const stringList = Gtk.StringList.new(["Dvorak", "QWERTY"]);
     phoneticLayoutDropdown.set_model(stringList);
 
-    // Устанавливаем текущий выбор
     const currentLayout = settings.get_string("phonetic-layout");
     phoneticLayoutDropdown.set_selected(currentLayout === "dvorak" ? 0 : 1);
 
@@ -116,7 +107,6 @@ export default class TranscodeAppSearchPreferences extends ExtensionPreferences 
 
     page.add(layoutGroup);
 
-    // Добавляем страницу напрямую в окно, предоставленное GNOME
     window.add(page);
   }
 }

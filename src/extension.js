@@ -5,42 +5,42 @@ import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
 
 // Cyrillic to Latin transliteration
 const cyrillicToLatinDefault = new Map([
-  ["а", "a"],
-  ["б", "b"],
-  ["в", "v"],
-  ["г", "g"],
-  ["д", "d"],
-  ["е", "e"],
-  ["ё", "yo"],
-  ["ж", "zh"],
-  ["з", "z"],
-  ["и", "i"],
-  ["й", "y"],
-  ["к", "k"],
-  ["л", "l"],
-  ["м", "m"],
-  ["н", "n"],
-  ["о", "o"],
-  ["п", "p"],
-  ["р", "r"],
-  ["с", "s"],
-  ["т", "t"],
-  ["у", "u"],
-  ["ы", "y"],
-  ["х", "h"],
-  ["ф", "f"],
-  ["ц", "c"],
-  ["ч", "ch"],
-  ["ш", "sh"],
-  ["щ", "sch"],
-  ["ь", ""],
-  ["ъ", ""],
-  ["э", "e"],
-  ["ю", "yu"],
-  ["я", "ya"],
+  ["а", "f"],
+  ["б", ","],
+  ["в", "d"],
+  ["г", "u"],
+  ["д", "l"],
+  ["е", "t"],
+  ["ё", "`"],
+  ["ж", ";"],
+  ["з", "p"],
+  ["и", "b"],
+  ["й", "q"],
+  ["к", "r"],
+  ["л", "k"],
+  ["м", "v"],
+  ["н", "y"],
+  ["о", "j"],
+  ["п", "g"],
+  ["р", "h"],
+  ["с", "c"],
+  ["т", "n"],
+  ["у", "e"],
+  ["ы", "s"],
+  ["х", "["],
+  ["ф", "a"],
+  ["ц", "w"],
+  ["ч", "x"],
+  ["ш", "i"],
+  ["щ", "o"],
+  ["ь", "m"],
+  ["ъ", "]"],
+  ["э", "'"],
+  ["ю", "."],
+  ["я", "z"],
 ]);
 
-// Default phonetic layout (Dvorak-like phonetic)
+// Default phonetic layout
 const phoneticLayoutDefault = new Map([
   ["а", "a"],
   ["б", "b"],
@@ -107,60 +107,45 @@ export default class TranscodeAppSearchExtension extends Extension {
       originalGetInitialResultSet =
         AppDisplay.AppSearchProvider.prototype.getInitialResultSet;
 
-      // ВАЖНО: Делаем функцию асинхронной (async), так как GNOME 45+ ожидает Promise
+      // Make async
       AppDisplay.AppSearchProvider.prototype.getInitialResultSet =
         async function (terms, cancellable) {
           let results = [];
 
-          try {
-            // ВАЖНО: Дожидаемся (await) выполнения оригинального поиска GNOME
-            let origResults = await originalGetInitialResultSet.call(
-              this,
-              terms,
-              cancellable,
-            );
-            if (Array.isArray(origResults)) {
-              results = origResults;
-            }
-          } catch (e) {
-            console.error(
-              "TranscodeAppSearch: Ошибка в оригинальном поиске",
-              e,
-            );
+          // await original search GNOME
+          let origResults = await originalGetInitialResultSet.call(
+            this,
+            terms,
+            cancellable,
+          );
+          if (Array.isArray(origResults)) {
+            results = origResults;
           }
 
           let query = terms.join(" ");
           let groups = [];
 
-          try {
-            if (settings.get_boolean("enable-cyrillic-to-latin")) {
-              groups = groups.concat(
-                Gio.DesktopAppInfo.search(transcode(query, cyrillicToLatin)) ||
-                  [],
-              );
-            }
+          if (settings.get_boolean("enable-cyrillic-to-latin")) {
+            groups = groups.concat(
+              Gio.DesktopAppInfo.search(transcode(query, cyrillicToLatin)) ||
+                [],
+            );
+          }
 
-            if (settings.get_boolean("enable-latin-to-cyrillic")) {
-              groups = groups.concat(
-                Gio.DesktopAppInfo.search(transcode(query, latinToCyrillic)) ||
-                  [],
-              );
-            }
+          if (settings.get_boolean("enable-latin-to-cyrillic")) {
+            groups = groups.concat(
+              Gio.DesktopAppInfo.search(transcode(query, latinToCyrillic)) ||
+                [],
+            );
+          }
 
-            if (settings.get_boolean("enable-phonetic-layout")) {
-              groups = groups.concat(
-                Gio.DesktopAppInfo.search(transcode(query, phoneticLayout)) ||
-                  [],
-              );
-              groups = groups.concat(
-                Gio.DesktopAppInfo.search(transcode(query, phoneticToLatin)) ||
-                  [],
-              );
-            }
-          } catch (error) {
-            console.error(
-              "TranscodeAppSearch: Ошибка при транслитерации",
-              error,
+          if (settings.get_boolean("enable-phonetic-layout")) {
+            groups = groups.concat(
+              Gio.DesktopAppInfo.search(transcode(query, phoneticLayout)) || [],
+            );
+            groups = groups.concat(
+              Gio.DesktopAppInfo.search(transcode(query, phoneticToLatin)) ||
+                [],
             );
           }
 

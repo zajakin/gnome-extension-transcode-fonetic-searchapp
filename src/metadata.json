@@ -1,7 +1,7 @@
 {
-  "description": "Searching apps both direct and transcoded name in fonetic layout (English, Russian, Ukrainian languages)",
+  "description": "Searching apps both direct and transcoded name in fonetic layout (English, Russian, Ukrainian languages). Fork of Transcode App Search by Statyan",
   "name": "Transcode App Search (Fonetic)",
-  "shell-version": ["45", "46", "47", "48", "49","50"],
+  "shell-version": ["45", "46", "47", "48", "49", "50"],
   "url": "https://github.com/zajakin/gnome-extension-transcode-fonetic-searchapp",
   "uuid": "transcode-fonetic-searchapp@zajakin.github.io",
   "settings-schema": "org.gnome.shell.extensions.transcode-fonetic-searchapp",
