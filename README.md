@@ -11,7 +11,7 @@ Gnome-shell extension making apps search in launcher layout-idependent Simply in
 ✅ Система настроек - добавлена поддержка GSettings для управления включением/отключением методов транслитерации
 
 ```         
-Поместите файлы из папки "src" в "~/.local/share/gnome-shell/extensions/transcode-fonetic-searchapp\@zajakin.github.io/"
+Поместите файлы из папки "src" в "~/.local/share/gnome-shell/extensions/transcode-fonetic-searchapp@zajakin.github.io/"
 
 Перезагрузитесь
 ```
