@@ -17,6 +17,7 @@ export default class TranscodeAppSearchPreferences extends ExtensionPreferences 
       description: "Enable or disable different transliteration methods",
     });
 
+    // Cyrillic to Latin
     const cyrillicToLatinSwitch = new Gtk.Switch({
       active: settings.get_boolean("enable-cyrillic-to-latin"),
       valign: Gtk.Align.CENTER,
@@ -35,6 +36,7 @@ export default class TranscodeAppSearchPreferences extends ExtensionPreferences 
     cyrillicToLatinRow.add_suffix(cyrillicToLatinSwitch);
     transliterationGroup.add(cyrillicToLatinRow);
 
+    // Latin to Cyrillic
     const latinToCyrillicSwitch = new Gtk.Switch({
       active: settings.get_boolean("enable-latin-to-cyrillic"),
       valign: Gtk.Align.CENTER,
@@ -53,6 +55,7 @@ export default class TranscodeAppSearchPreferences extends ExtensionPreferences 
     latinToCyrillicRow.add_suffix(latinToCyrillicSwitch);
     transliterationGroup.add(latinToCyrillicRow);
 
+    // Phonetic Layout
     const phoneticLayoutSwitch = new Gtk.Switch({
       active: settings.get_boolean("enable-phonetic-layout"),
       valign: Gtk.Align.CENTER,
@@ -73,40 +76,6 @@ export default class TranscodeAppSearchPreferences extends ExtensionPreferences 
     transliterationGroup.add(phoneticLayoutRow);
 
     page.add(transliterationGroup);
-
-    const layoutGroup = new Adw.PreferencesGroup({
-      title: "Phonetic Layout Type",
-      description: "Choose the phonetic layout to use",
-    });
-
-    const phoneticLayoutDropdown = new Gtk.DropDown();
-    const stringList = Gtk.StringList.new(["Dvorak", "QWERTY"]);
-    phoneticLayoutDropdown.set_model(stringList);
-
-    const currentLayout = settings.get_string("phonetic-layout");
-    phoneticLayoutDropdown.set_selected(currentLayout === "dvorak" ? 0 : 1);
-
-    phoneticLayoutDropdown.connect("notify::selected-item", () => {
-      const selected = phoneticLayoutDropdown.get_selected();
-      const layoutValue = selected === 0 ? "dvorak" : "qwerty";
-      settings.set_string("phonetic-layout", layoutValue);
-    });
-
-    settings.connect("changed::phonetic-layout", () => {
-      const currentValue = settings.get_string("phonetic-layout");
-      const index = currentValue === "dvorak" ? 0 : 1;
-      phoneticLayoutDropdown.set_selected(index);
-    });
-
-    const layoutRow = new Adw.ActionRow({
-      title: "Layout Type",
-      activatable_widget: phoneticLayoutDropdown,
-    });
-    layoutRow.add_suffix(phoneticLayoutDropdown);
-    layoutGroup.add(layoutRow);
-
-    page.add(layoutGroup);
-
     window.add(page);
   }
 }

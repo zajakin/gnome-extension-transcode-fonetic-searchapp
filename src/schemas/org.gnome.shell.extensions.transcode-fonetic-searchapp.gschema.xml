@@ -16,10 +16,5 @@
       <summary>Enable phonetic layout transliteration</summary>
       <description>Support phonetic keyboard layout transliteration</description>
     </key>
-    <key type="s" name="phonetic-layout">
-      <default>"dvorak"</default>
-      <summary>Phonetic layout type</summary>
-      <description>The phonetic layout to use (dvorak or custom)</description>
-    </key>
   </schema>
 </schemalist>
